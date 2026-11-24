@@ -112,8 +112,10 @@ Install local prerequisites first:
 
 - [`uv`](https://docs.astral.sh/uv/getting-started/installation/) for Python
   environments and dependency management.
-- `tmux`, required for native Claude/Codex terminals launched by the local host
+- `tmux`, required for native Copilot, Claude, and Codex terminals launched by the local host
   (`brew install tmux` on macOS, or `apt install tmux` on Debian/Ubuntu).
+- GitHub Copilot CLI to exercise the native Copilot handoff. The
+  [dis devcontainer](.dis/Dockerfile) includes the version used in CI.
 - `bubblewrap` (`bwrap`), **Linux only**, used to OS-sandbox those native
   Claude/Codex/Pi terminals (`apt install bubblewrap` on Debian/Ubuntu). macOS
   uses the built-in `seatbelt` sandbox and needs nothing extra.
@@ -122,8 +124,8 @@ Install local prerequisites first:
 - A Rust toolchain for the recommended `omnidev` local development supervisor.
 
 ```bash
-git clone https://github.com/omnigent-ai/omnigent.git
-cd omnigent
+git clone https://github.com/candacelabs/omnigent-copilot-cli.git
+cd omnigent-copilot-cli
 
 uv python install
 uv venv --python "$(cat .python-version)"
