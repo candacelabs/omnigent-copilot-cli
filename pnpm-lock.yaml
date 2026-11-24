@@ -522,8 +522,8 @@ importers:
         specifier: ^6.0.304
         version: 6.0.304(zod@4.6.7)
       ai-elements:
-        specifier: ^1.9.0
-        version: 1.9.0
+        specifier: ^1.9.1
+        version: 1.9.1
       fake-indexeddb:
         specifier: ^6.2.5
         version: 6.2.5
@@ -5060,8 +5060,8 @@ packages:
       react: ^18.2.0
       react-dom: ^18.2.0
 
-  ai-elements@1.9.0:
-    resolution: {integrity: sha512-lIBC48Y5ZWd9tKFDx6V6LoLl7RlKs9L/tAQA3J4N5SFDqqJglM+PX7kocAiuS/w0KeRFUXzXVsSgJNLGp3BwNQ==}
+  ai-elements@1.9.1:
+    resolution: {integrity: sha512-/2TUU8PzZNz+a1LeEE+4mjb9U3KTmjxlqGIpz3OeMR0ukj4YUf3CBfF+Kgd2ahZzp8T6rQIGWn7D+oaRUaSk7A==}
     hasBin: true
 
   ai@6.0.304:
@@ -14837,7 +14837,7 @@ snapshots:
       screenfull: 5.2.0
       tslib: 2.8.1
 
-  ai-elements@1.9.0: {}
+  ai-elements@1.9.1: {}
 
   ai@6.0.304(zod@4.6.7):
     dependencies:

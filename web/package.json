@@ -143,7 +143,7 @@
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/coverage-v8": "catalog:",
     "ai": "^6.0.304",
-    "ai-elements": "^1.9.0",
+    "ai-elements": "^1.9.1",
     "fake-indexeddb": "^6.2.5",
     "jsdom": "^29.1.1",
     "lightningcss": "^1.29.1",
