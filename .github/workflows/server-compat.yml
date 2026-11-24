@@ -85,7 +85,7 @@ jobs:
         shell: bash
         run: |
           # Latest final (non-prerelease) tag by version sort.
-          tag=$(git tag --sort=-v:refname \
+          tag=$(git tag --list 'v[0-9]*' --sort=-v:refname \
             | grep -viE '(^|[^a-z])(rc|dev|pre)[0-9]' \
             | head -1)
           if [ -z "$tag" ]; then
