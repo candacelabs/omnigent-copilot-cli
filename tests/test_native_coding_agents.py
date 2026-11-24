@@ -82,6 +82,18 @@ def test_kiro_native_agent_metadata_and_aliases() -> None:
     )
 
 
+def test_copilot_native_session_identity_is_distinct_from_sdk_chat() -> None:
+    """Both spellings of the native harness route back to its own terminal."""
+    agent = native_coding_agent_for_harness("copilot-native")
+    assert agent is not None
+    assert native_coding_agent_for_harness("native-copilot") is agent
+    assert native_coding_agent_for_wrapper_label(agent.wrapper_label) is agent
+    assert agent.terminal_name == "copilot"
+    assert agent.cli_command == "copilot-native"
+    assert native_coding_agent_for_harness("copilot") is None
+    assert native_coding_agent_for_harness("github-copilot") is None
+
+
 def test_unknown_harness_returns_none() -> None:
     """A non-native harness stays unresolved (no terminal presentation)."""
     assert native_coding_agent_for_harness("claude-sdk") is None

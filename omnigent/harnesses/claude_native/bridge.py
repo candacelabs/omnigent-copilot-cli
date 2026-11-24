@@ -935,6 +935,12 @@ def _trusted_parent_for_bridge_dir(target: Path) -> Path:
             trusted_parent = opencode_root.parent.parent
         return _absolute_syntactic_path(trusted_parent)
 
+    from omnigent.harnesses.copilot_native.bridge import bridge_root as copilot_bridge_root
+
+    copilot_root = _absolute_syntactic_path(copilot_bridge_root())
+    if target.is_relative_to(copilot_root):
+        return _absolute_syntactic_path(copilot_root.parent.parent)
+
     kiro_root = _absolute_syntactic_path(kiro_bridge.bridge_root())
     if target.is_relative_to(kiro_root):
         # Same shape as cursor-native ($TMPDIR/omnigent-<uid>/kiro-native): trust
@@ -965,7 +971,7 @@ def _trusted_parent_for_bridge_dir(target: Path) -> Path:
         f"bridge dir {target!s} is not under an allowed bridge root "
         f"({claude_root!s}, {codex_root!s}, {pi_root!s}, {cursor_root!s}, "
         f"{devin_root!s}, {antigravity_root!s}, {qwen_root!s}, {hermes_root!s}, "
-        f"{opencode_root!s}, {kiro_root!s}, {acp_root!s}, {router_root!s})"
+        f"{opencode_root!s}, {copilot_root!s}, {kiro_root!s}, {acp_root!s}, {router_root!s})"
     )
 
 

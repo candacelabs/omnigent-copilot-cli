@@ -4,6 +4,9 @@
 !.github/
 !.github/**
 .github/**/.*/
+!.dis/
+.dis/*
+!.dis/Dockerfile
 
 .venv/
 build/

@@ -117,6 +117,7 @@ FILESYSTEM_ATTACHMENT_UPLOAD_HARNESSES: frozenset[str] = FILESYSTEM_ATTACHMENT_H
     "pi-native",
     "cursor-native",
     "kiro-native",
+    "copilot-native",
     "goose-native",
     "antigravity-native",
     "qwen-native",

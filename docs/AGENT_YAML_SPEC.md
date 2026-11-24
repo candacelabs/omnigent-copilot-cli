@@ -75,7 +75,7 @@ Canonical `executor.harness` ids:
 | Goose | `goose` | `goose-native` |
 | Kiro | — | `kiro-native` |
 | Antigravity | `antigravity` | `antigravity-native` |
-| GitHub Copilot | `copilot` | — |
+| GitHub Copilot | `copilot` | `copilot-native` |
 | Devin | — | `devin-native` |
 | Qwen Code | `qwen` | `qwen-native` |
 | Kimi Code | `kimi` | `kimi-native` |
@@ -289,6 +289,8 @@ final prompt. This setting supports `pi` and `pi-native` only. Native settings
 apply on the next terminal launch; explicit native CLI arguments remain available.
 
 ### GitHub Copilot
+
+`harness: copilot-native` (alias `native-copilot`) launches GitHub Copilot’s own interactive terminal. Start it with `omnigent copilot-native` and open the printed conversation URL to continue in Omnigent. The runner uses the local Copilot CLI, its credentials, and tmux. Messages from either interface share a Copilot session. Reattach with `omnigent copilot-native --resume <conversation-id>`.
 
 `harness: copilot` runs the agent through the
 [GitHub Copilot SDK](https://pypi.org/project/github-copilot-sdk/)

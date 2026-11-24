@@ -1,6 +1,6 @@
 # Dependabot opens individual version and security update PRs by default.
 # Keep only cross-pinned MLflow packages together so they can resolve in lockstep.
-# Weekly version updates retain the seven-day cooldown and existing PR limits.
+# Keep one routine update per ecosystem in this downstream build. Security updates use their own limit.
 #
 # Layout invariants (tests/scripts/test_dependabot_config.py checks them):
 #   - Declare each lockfile once, at its workspace root, so manifests and locks
@@ -20,7 +20,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
     cooldown:
       default-days: 7
     labels:
@@ -43,7 +43,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
     cooldown:
       default-days: 7
     labels:
@@ -82,7 +82,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
     cooldown:
       default-days: 7
     labels:
@@ -99,7 +99,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
     cooldown:
       default-days: 7
     labels:
@@ -114,7 +114,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
     cooldown:
       default-days: 7
     labels:
@@ -128,7 +128,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
     cooldown:
       default-days: 7
     labels:
@@ -145,7 +145,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
     cooldown:
       default-days: 7
     labels:
@@ -159,7 +159,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 1
     cooldown:
       default-days: 7
     labels:

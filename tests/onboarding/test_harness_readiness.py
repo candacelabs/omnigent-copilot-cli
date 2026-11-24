@@ -235,6 +235,8 @@ def test_sdk_and_unknown_harnesses_are_never_gated(
         "native-antigravity",
         "goose-native",
         "native-goose",
+        "copilot-native",
+        "native-copilot",
         "hermes",
         # Builtin ACP CLI harnesses gate on their vendor binary; every catalog
         # row (and alias) joins automatically.
@@ -567,6 +569,8 @@ def test_configured_harness_map_covers_all_spellings(
         "goose",
         "goose-native",
         "native-goose",
+        "copilot-native",
+        "native-copilot",
         # Antigravity SDK harness + its user-facing aliases.
         "antigravity",
         "agy",
@@ -653,6 +657,8 @@ def test_configured_harness_map_gates_only_cli_harnesses(
         "native-antigravity",
         "goose-native",
         "native-goose",
+        "copilot-native",
+        "native-copilot",
         "qwen",
         "hermes",
         *sorted(ACP_CLI_HARNESSES),

@@ -6376,6 +6376,35 @@ async def test_kiro_native_dispatch_clears_pending_when_injection_fails(
 
 
 @pytest.mark.asyncio
+async def test_copilot_terminal_input_preserves_a_different_queued_web_message() -> None:
+    from omnigent.runtime import pending_inputs
+    from omnigent.server.routes.sessions import _persist_external_conversation_item
+
+    store = _ConversationStore()
+    session_id = "823dbd1aab969b5a813fac59bb977a77"
+    conv = store.get_conversation(session_id)
+    assert conv is not None
+    conv.labels["omnigent.wrapper"] = "copilot-native-ui"
+    queued = pending_inputs.record(session_id, [{"type": "input_text", "text": "from the web"}])
+    try:
+        body = SessionEventInput(
+            type="external_conversation_item",
+            data={
+                "source_id": "copilot:terminal-1",
+                "item_type": "message",
+                "item_data": {
+                    "role": "user",
+                    "content": [{"type": "input_text", "text": "from the terminal"}],
+                },
+            },
+        )
+        await _persist_external_conversation_item(session_id, conv, body, store)  # type: ignore[arg-type]
+        assert [row["pending_id"] for row in pending_inputs.snapshot_for(session_id)] == [queued]
+    finally:
+        pending_inputs.reset_for_tests()
+
+
+@pytest.mark.asyncio
 async def test_kiro_external_prompt_matches_pending_and_reports_skipped_input() -> None:
     """A failed Kiro prompt must not make the next prompt clear the wrong pending input."""
     from omnigent.runtime import pending_inputs

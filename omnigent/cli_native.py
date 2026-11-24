@@ -91,6 +91,49 @@ def register_native_commands(cli: click.Group) -> None:
     _smart_routing_decision = _late_bound(lambda: _cli._smart_routing_decision)
 
     @cli.command(
+        "copilot-native",
+        context_settings={"ignore_unknown_options": True, "allow_extra_args": True},
+    )
+    @click.option("--server", help="Omnigent server URL, or local for a local server.")
+    @click.option(
+        "-r",
+        "--resume",
+        is_flag=False,
+        flag_value=_RESUME_PICKER_SENTINEL,
+        default=None,
+        help="Reattach to an Omnigent conversation by ID, or open the picker without an ID.",
+    )
+    @click.option("--model", help="Copilot model to use when starting the terminal.")
+    @click.option("-p", "--prompt", help="Send the first message when the terminal is ready.")
+    @click.argument("copilot_args", nargs=-1, type=click.UNPROCESSED)
+    def copilot_native(
+        server: str | None,
+        resume: str | None,
+        model: str | None,
+        prompt: str | None,
+        copilot_args: tuple[str, ...],
+    ) -> None:
+        """Open GitHub Copilot CLI and continue the same session from Omnigent."""
+        _reject_native_on_windows("copilot-native")
+        from omnigent.harness_startup_config import resolve_harness_command
+        from omnigent.harnesses.copilot_native.main import run_copilot_native
+
+        cfg = _load_effective_config()
+        command = resolve_harness_command("copilot-native", default="", cfg=cfg)
+        if command:
+            os.environ["OMNIGENT_COPILOT_PATH"] = command
+        choice = _split_resume_value(resume)
+        run_copilot_native(
+            server=_ensure_backend(server if server is not None else cfg.get("server")),
+            session_id=choice.conversation_id,
+            resume_picker=choice.picker,
+            model=model,
+            prompt=prompt,
+            extra_args=_resolve_harness_startup_args(cfg, "copilot-native", copilot_args),
+            auto_open_conversation=_resolve_auto_open_conversation_from_config(cfg),
+        )
+
+    @cli.command(
         context_settings={
             "ignore_unknown_options": True,
             "allow_extra_args": True,

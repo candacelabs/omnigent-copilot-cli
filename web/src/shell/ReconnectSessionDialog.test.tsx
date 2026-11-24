@@ -98,6 +98,17 @@ describe("buildReconnectCommand", () => {
     expect(cmd).not.toContain("path/to/agent.yaml");
   });
 
+  it("reconnects through the Copilot terminal command", () => {
+    const cmd = buildReconnectCommand({
+      conversationId: "abc123",
+      serverUrl: "https://example.org",
+      state: "local_stranded",
+      wrapper: "copilot-native-ui",
+    });
+    expect(cmd).toContain("omnigent copilot-native ");
+    expect(cmd).toContain("--resume abc123");
+  });
+
   it("prefers `omnigent host` for a host_offline claude-native session", () => {
     // A claude-native session can still be host-bound; while the host is
     // down the host relaunches whatever runtime it needs, so host wins.

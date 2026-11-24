@@ -49,6 +49,9 @@ CLAUDE_NATIVE_WRAPPER_VALUE = "claude-code-native-ui"
 # ``conversations.labels[WRAPPER_LABEL_KEY]``.
 CODEX_NATIVE_WRAPPER_VALUE = "codex-native-ui"
 
+# The native Copilot CLI terminal resource and its conversation share this label.
+COPILOT_NATIVE_WRAPPER_VALUE = "copilot-native-ui"
+
 # Value the ``omnigent pi`` wrapper writes into
 # ``conversations.labels[WRAPPER_LABEL_KEY]``.
 PI_NATIVE_WRAPPER_VALUE = "pi-native-ui"

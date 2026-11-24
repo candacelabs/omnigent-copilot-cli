@@ -91,14 +91,14 @@ export function buildReconnectCommand({
     return ["omnigent host \\", `  --server ${quotedServerUrl}`].join("\n");
   }
   // Every native TUI wrapper resumes through its own verb (`omnigent devin
-  // --resume …`), and the verb is the registry key — the generic
+  // --resume …`), and the registry supplies the verb — the generic
   // `omnigent run <agent.yaml>` below cannot resume one at all, so it was wrong
   // for every native harness except claude. Fall back to the canonical harness
   // when there's no wrapper label (a label-less pre-native session).
   const nativeAgent = nativeCodingAgentForWrapper(wrapper) ?? nativeCodingAgentForHarness(harness);
   if (nativeAgent !== undefined) {
     return [
-      `omnigent ${nativeAgent.key} \\`,
+      `omnigent ${nativeAgent.cliCommand ?? nativeAgent.key} \\`,
       `  --resume ${conversationId} \\`,
       `  --server ${quotedServerUrl}`,
     ].join("\n");

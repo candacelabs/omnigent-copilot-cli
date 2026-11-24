@@ -1,0 +1,80 @@
+name: Native Copilot CLI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - "omnigent/**"
+      - "tests/**"
+      - "web/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/copilot-native.yml"
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  shared-session:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      OMNIGENT_SKIP_WEB_UI: "true"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: ./.github/actions/setup-uv
+      - uses: ./.github/actions/setup-pnpm
+        with:
+          cache: ""
+      - name: Install the supported native CLI and tmux
+        run: |
+          npm install --global @github/copilot@1.0.114
+          sudo apt-get update -qq
+          sudo apt-get install --yes tmux bubblewrap
+          copilot --version
+          tmux -V
+      - name: Run the native test suite and terminal handoff
+        run: |
+          uv sync --frozen --group dev
+          uv run --no-sync pytest -q tests/harnesses/copilot_native \
+            tests/inner/test_copilot_native_executor.py tests/runner/test_copilot_native_terminal.py \
+            tests/e2e/test_copilot_native_cli_e2e.py
+
+  distributions:
+    needs: shared-session
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: ./.github/actions/setup-uv
+      - uses: ./.github/actions/setup-pnpm
+      - name: Build Omnigent and the matching packages
+        run: |
+          pnpm install --frozen-lockfile --filter web
+          pnpm --filter web run build
+          uv build --out-dir dist
+          uv run --no-project --with build python scripts/build_subpackages.py \
+            --out-dir dist omnigent-client omnigent-ui-sdk omnigent-slack
+          uvx twine check --strict dist/*
+      - name: Verify the wheel installation outside the checkout
+        run: |
+          uv venv --python 3.12 "$RUNNER_TEMP/installed"
+          uv pip install --python "$RUNNER_TEMP/installed/bin/python" dist/*.whl
+          cd "$RUNNER_TEMP"
+          installed/bin/omnigent copilot-native --help
+          installed/bin/python - <<'PY'
+          from importlib.resources import files
+          from omnigent.native.native_coding_agents import native_coding_agent_for_harness
+          assert native_coding_agent_for_harness("copilot-native").terminal_name == "copilot"
+          assert files("omnigent.server").joinpath("static/web-ui/index.html").is_file()
+          PY
+      - name: Checksum the release files
+        working-directory: dist
+        run: sha256sum *.whl *.tar.gz > SHA256SUMS
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: copilot-native-distributions
+          path: dist/
+          if-no-files-found: error

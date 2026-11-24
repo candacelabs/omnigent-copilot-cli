@@ -50,5 +50,5 @@ jobs:
           fi
 
           pin="$unique_pins"
-          git fetch --no-tags --depth=1 origin "$pin"
+          git fetch --no-tags --depth=1 "$GITHUB_SERVER_URL/omnigent-ai/omnigent.git" "$pin"
           git diff --exit-code "$pin" HEAD -- .github/actions/setup-harness-cli

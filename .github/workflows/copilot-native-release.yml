@@ -1,0 +1,33 @@
+name: Publish native Copilot CLI
+on:
+  push:
+    tags: ["copilot-native-v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    uses: ./.github/workflows/copilot-native.yml
+  release:
+    if: github.repository == 'candacelabs/omnigent-copilot-cli'
+    needs: verify
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: copilot-native-distributions
+          path: dist
+      - name: Publish the tested distributions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        working-directory: dist
+        run: |
+          sha256sum --check SHA256SUMS
+          gh release create "$TAG" --verify-tag --title "GitHub Copilot CLI for Omnigent ($TAG)" \
+            --notes "Start Copilot in its own terminal and continue the same conversation from Omnigent. For installation and reattachment, see the README at this tag. The release includes matching Python wheels, source distributions and SHA-256 checksums." \
+            *.whl *.tar.gz SHA256SUMS

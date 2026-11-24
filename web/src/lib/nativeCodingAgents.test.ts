@@ -18,6 +18,14 @@ import {
 } from "./nativeCodingAgents";
 
 describe("nativeCodingAgentForHarness", () => {
+  it("opens Copilot CLI sessions in the terminal while preserving the SDK chat", () => {
+    const native = nativeCodingAgentForHarness("copilot-native");
+    expect(native?.displayName).toBe("GitHub Copilot CLI");
+    expect(nativeCodingAgentForHarness("native-copilot")).toBe(native);
+    expect(nativeCodingAgentForHarness("copilot")).toBeUndefined();
+    expect(isNativeWrapper("copilot-native-ui")).toBe(true);
+  });
+
   it("resolves the canonical pi-native harness", () => {
     expect(nativeCodingAgentForHarness("pi-native")?.key).toBe("pi");
   });

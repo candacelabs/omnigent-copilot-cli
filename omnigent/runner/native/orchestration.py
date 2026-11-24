@@ -1324,11 +1324,12 @@ async def _pi_native_launch_config(
     *,
     session_id: str,
     server_client: httpx.AsyncClient | None,
+    runtime_label: str = "Pi",
 ) -> _PiNativeLaunchConfig:
     """
     Fetch and validate a session's persisted native-terminal launch config.
 
-    Shared by the pi-native and cursor-native launch paths.
+    Shared by native terminals that consume workspace, arguments and model selection.
 
     :param session_id: Session/conversation id.
     :param server_client: Runner Omnigent server client.
@@ -1337,24 +1338,28 @@ async def _pi_native_launch_config(
     snapshot = await _fetch_native_launch_snapshot(
         server_client=server_client,
         session_id=session_id,
-        runtime_label="Pi",
+        runtime_label=runtime_label,
     )
     terminal_launch_args = snapshot.get("terminal_launch_args")
     if terminal_launch_args is not None and not (
         isinstance(terminal_launch_args, list)
         and all(isinstance(arg, str) for arg in terminal_launch_args)
     ):
-        raise RuntimeError(f"Invalid terminal_launch_args for Pi session {session_id!r}.")
+        raise RuntimeError(
+            f"Invalid terminal_launch_args for {runtime_label} session {session_id!r}."
+        )
     external_session_id = snapshot.get("external_session_id")
     if external_session_id is not None and (
         not isinstance(external_session_id, str) or not external_session_id
     ):
-        raise RuntimeError(f"Invalid external_session_id for Pi session {session_id!r}.")
+        raise RuntimeError(
+            f"Invalid external_session_id for {runtime_label} session {session_id!r}."
+        )
     session_workspace = snapshot.get("workspace")
     if session_workspace is not None and (
         not isinstance(session_workspace, str) or not session_workspace
     ):
-        raise RuntimeError(f"Invalid workspace for Pi session {session_id!r}.")
+        raise RuntimeError(f"Invalid workspace for {runtime_label} session {session_id!r}.")
     # Fork directives stamped on a clone at fork time. Only consulted when the
     # clone has no external_session_id of its own yet (see the fork branches in
     # _auto_create_pi_terminal); inert otherwise. Mirrors the codex-native and
@@ -10529,8 +10534,7 @@ async def _delete_native_bridge_dirs(
     holding a bridge token / auth secret + MCP config — secret material. Closing
     the pane does not remove it, so without this they accumulate even on a clean
     session delete (issue #1350). We don't know which harness this session used,
-    so delete every candidate dir for all 11 native families
-    (antigravity/claude/codex/cursor/goose/hermes/kimi/kiro/opencode/pi/qwen);
+    so delete every candidate bridge directory;
     the per-target ``FileNotFoundError`` swallow makes wrong-harness / already-gone
     cases a no-op, while other ``OSError``s are logged at debug rather than hidden.
     Antigravity/claude/codex/opencode bridge ids can be rotated via a session
@@ -10558,6 +10562,9 @@ async def _delete_native_bridge_dirs(
     )
     from omnigent.harnesses.codex_native.bridge import (
         bridge_dir_for_bridge_id as codex_bridge_dir,
+    )
+    from omnigent.harnesses.copilot_native.bridge import (
+        bridge_dir_for_session_id as copilot_bridge_dir,
     )
     from omnigent.harnesses.cursor_native.bridge import (
         bridge_dir_for_session_id as cursor_bridge_dir,
@@ -10602,6 +10609,7 @@ async def _delete_native_bridge_dirs(
         claude_bridge_dir(session_id),
         codex_bridge_dir(labels.get(CODEX_NATIVE_BRIDGE_ID_LABEL_KEY) or session_id),
         codex_bridge_dir(session_id),
+        copilot_bridge_dir(session_id),
         cursor_bridge_dir(session_id),
         goose_bridge_dir(session_id),
         hermes_bridge_dir(session_id),

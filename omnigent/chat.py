@@ -1304,7 +1304,7 @@ def _redirect_native_resume_if_needed(
         progress=progress,
         conversation_id=conversation_id,
         wrapper_name=native_agent.harness,
-        native_command=native_agent.key,
+        native_command=native_agent.cli_command or native_agent.key,
     )
     run_native(
         server=base_url,

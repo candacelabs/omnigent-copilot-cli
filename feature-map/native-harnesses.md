@@ -9,6 +9,8 @@ implements them separately, so a fix for one harness does not reach the others.
 
 ## Sub-features
 
+- `copilot-shared-terminal`: start GitHub Copilot CLI with `omnigent copilot-native`, continue from the Omnigent conversation, and reattach to the same terminal with `--resume`.
+
 - `launch-web`: pick the harness in the new-session composer and start a session.
 - `picker-curation`: server config `restrict_to_agent_names` limits and orders
   what New Chat offers, and `default_agent_name` pre-selects one for a user

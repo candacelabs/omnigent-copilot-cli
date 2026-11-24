@@ -50,6 +50,7 @@ from omnigent.harness_plugins import harness_install_keys, valid_harnesses
 from omnigent.harnesses.antigravity_native.credentials import antigravity_credentials_ready
 from omnigent.onboarding.harness_install import (
     COPILOT_KEY,
+    COPILOT_NATIVE_KEY,
     CURSOR_KEY,
     DEVIN_KEY,
     GOOSE_KEY,
@@ -283,6 +284,8 @@ def _harness_availability_core(harness: str) -> HarnessAvailability:
         from omnigent.onboarding.cursor_auth import cursor_api_key_configured
 
         return cursor_api_key_configured() or bool(os.environ.get("CURSOR_API_KEY"))
+    if canonical in {COPILOT_NATIVE_KEY, "native-copilot"}:
+        return _installer_only_availability(COPILOT_NATIVE_KEY)
     if canonical == COPILOT_KEY:
         # Copilot runs in-process via the ``github-copilot-sdk`` package (the
         # SDK bundles the CLI binary it drives, so there is no separate binary to
@@ -1101,6 +1104,7 @@ def configured_harness_map() -> dict[str, HarnessAvailability]:
     spellings.add(KIMI_SURFACE)
     spellings.add(GOOSE_KEY)  # headless Goose (``goose acp``) gates on the goose binary
     spellings.add(HERMES_KEY)  # Hermes Agent wraps the ``hermes`` CLI
+    spellings.update({COPILOT_NATIVE_KEY, "native-copilot"})
     spellings.add(COPILOT_KEY)
     # Include configured ACP slugs because the picker uses their full IDs.
     try:
