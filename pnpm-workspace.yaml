@@ -44,7 +44,7 @@ catalog:
   '@shikijs/langs': 4.5.0
   '@shikijs/themes': 4.5.0
   '@shikijs/types': 4.5.0
-  '@shikijs/transformers': 4.5.0
+  '@shikijs/transformers': 4.6.0
   '@shikijs/stream': 4.5.0
   vite: 8.1.6
   # Keep workspace test runners and their coverage provider on one release.
