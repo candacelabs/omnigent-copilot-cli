@@ -173,6 +173,7 @@ GOOSE_KEY = "goose"
 # :func:`omnigent.onboarding.harness_readiness.harness_is_configured`). The key
 # is kept here purely as the canonical harness id the readiness layer shares.
 COPILOT_KEY = "copilot"
+COPILOT_NATIVE_KEY = "copilot-native"
 
 # Hermes Agent is installed via a curl installer from Nous Research and
 # authenticates through its own ``hermes model`` interactive flow (no
@@ -331,6 +332,13 @@ _HARNESS_INSTALL: dict[str, HarnessInstallSpec] = {
         # Direct GEMINI_API_KEY authentication first shipped in agy 1.1.13.
         min_version=_ANTIGRAVITY_MIN_VERSION,
     ),
+    COPILOT_NATIVE_KEY: HarnessInstallSpec(
+        "GitHub Copilot CLI",
+        "copilot",
+        "@github/copilot",
+        login_args=("login",),
+        min_version="1.0.112",
+    ),
     GOOSE_KEY: HarnessInstallSpec(
         "Goose",
         "goose",
@@ -378,6 +386,8 @@ _HARNESS_INSTALL: dict[str, HarnessInstallSpec] = {
 _HARNESS_NAME_TO_KEY: dict[str, str] = {
     "claude-native": ANTHROPIC_FAMILY,
     "codex-native": OPENAI_FAMILY,
+    COPILOT_NATIVE_KEY: COPILOT_NATIVE_KEY,
+    "native-copilot": COPILOT_NATIVE_KEY,
     PI_KEY: PI_KEY,
     "pi-native": PI_KEY,
     # Kimi is multi-provider but binary-gated: cannot launch without the
@@ -440,6 +450,7 @@ _HARNESS_NAME_TO_KEY: dict[str, str] = {
 _UI_INSTALLABLE_HARNESS_TO_KEY: dict[str, str] = {
     "claude": ANTHROPIC_FAMILY,
     "codex": OPENAI_FAMILY,
+    COPILOT_NATIVE_KEY: COPILOT_NATIVE_KEY,
     PI_KEY: PI_KEY,
     OPENCODE_KEY: OPENCODE_KEY,
     QWEN_KEY: QWEN_KEY,
@@ -569,6 +580,14 @@ _UI_AUTH_STEP_BY_KEY: dict[str, SetupStep] = {
         action="auth",
         command="codex login",
         status_key="authed",
+    ),
+    COPILOT_NATIVE_KEY: SetupStep(
+        kind="auth",
+        title="Sign in to GitHub Copilot",
+        detail="Sign in on the host where the Copilot terminal runs.",
+        action="command",
+        command="copilot login",
+        status_key=None,
     ),
     OPENCODE_KEY: SetupStep(
         kind="auth",
@@ -977,15 +996,15 @@ def harness_install_spec(key: str) -> HarnessInstallSpec | None:
 
 
 def harness_cli_binary(key: str) -> str | None:
-    """Resolve the CLI selected for an install key, including Pi's path override."""
+    """Resolve the CLI selected for an install key, honoring its native command override."""
     spec = harness_install_spec(key)
     if spec is None:
         return None
     command = spec.binary
-    if key == PI_KEY:
+    if key in {PI_KEY, COPILOT_NATIVE_KEY}:
         from omnigent.harness_startup_config import resolve_harness_path
 
-        command = resolve_harness_path("pi") or command
+        command = resolve_harness_path(key) or command
     return resolve_cli_binary(command)
 
 

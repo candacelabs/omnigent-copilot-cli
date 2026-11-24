@@ -7788,6 +7788,11 @@ def test_native_terminal_dispatch_specs_cover_registered_native_agents() -> None
             {"extra_args": (), "model": "native-model", "prompt": None},
         ),
         (
+            "copilot-native",
+            "omnigent.harnesses.copilot_native.main.run_copilot_native",
+            {"extra_args": (), "model": "native-model", "prompt": None},
+        ),
+        (
             "pi-native",
             "omnigent.harnesses.pi_native.main.run_pi_native",
             {"extra_args": ("--model", "native-model")},

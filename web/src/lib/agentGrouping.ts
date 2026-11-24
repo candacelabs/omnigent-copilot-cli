@@ -19,6 +19,7 @@ export const BUILTIN_AGENTS = new Set([
   "cursor-native-ui", // Cursor
   "kiro-native-ui", // Kiro
   "antigravity-native-ui", // Antigravity
+  "copilot-native-ui", // GitHub Copilot CLI
   "goose-native-ui", // Goose
   "qwen-native-ui", // Qwen Code
   "kimi-native-ui", // Kimi

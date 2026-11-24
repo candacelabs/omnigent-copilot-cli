@@ -303,7 +303,7 @@ def spawn_cli_background(
     return handle
 
 
-_CONV_ID_RE = re.compile(r"(conv_[0-9a-f]+)")
+_CONV_ID_RE = re.compile(r"(conv_[0-9a-f]+|(?<=/c/)[0-9a-f]{32}\b)")
 
 
 def wait_for_conversation_id(handle: PtyHandle, *, timeout: float) -> str:
@@ -340,7 +340,9 @@ def conversation_id_from_output(output: str) -> str:
     :returns: The conversation id.
     :raises AssertionError: If no id is found (the run never created a session).
     """
-    match = re.search(r"--resume (conv_[0-9a-f]+)", output) or _CONV_ID_RE.search(output)
+    match = re.search(r"--resume (conv_[0-9a-f]+|[0-9a-f]{32}\b)", output) or _CONV_ID_RE.search(
+        output
+    )
     assert match is not None, f"no conversation id in CLI output:\n{output[-2000:]}"
     return match.group(1)
 

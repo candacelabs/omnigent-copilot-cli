@@ -1,6 +1,10 @@
 import { arrayMove } from "@dnd-kit/sortable";
 import type { Conversation, SessionSortBy } from "@/hooks/useConversations";
-import { nativeCodingAgentForWrapper, WRAPPER_LABEL_KEY } from "@/lib/nativeCodingAgents";
+import {
+  type NativeCodingAgentIconKind,
+  nativeCodingAgentForWrapper,
+  WRAPPER_LABEL_KEY,
+} from "@/lib/nativeCodingAgents";
 import { getOptimisticTitle } from "@/lib/optimisticTitles";
 import { PROJECT_LABEL_KEY, PINNED_LABEL_KEY } from "@/lib/sessionListCache";
 import {
@@ -126,21 +130,7 @@ export const CLAUDE_NATIVE_DEFAULT_LABEL = "Claude Code";
 export const CODEX_NATIVE_DEFAULT_LABEL = "Codex";
 export const PI_NATIVE_DEFAULT_LABEL = "Pi";
 
-export type ConversationIconKind =
-  | "claude"
-  | "codex"
-  | "opencode"
-  | "pi"
-  | "cursor"
-  | "kiro"
-  | "goose"
-  | "antigravity"
-  | "qwen"
-  | "kimi"
-  | "hermes"
-  | "devin"
-  | "nessie"
-  | null;
+export type ConversationIconKind = NativeCodingAgentIconKind | "nessie" | null;
 
 // Display label for a session with no title and no native-wrapper name —
 // shown in the sidebar row and as the browser tab title fallback.

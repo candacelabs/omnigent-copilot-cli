@@ -206,6 +206,14 @@ _UNIFORM_INTERRUPT: dict[str, _UniformInterrupt] = {
         (RuntimeError,),
         True,
     ),
+    "copilot": _UniformInterrupt(
+        "omnigent.harnesses.copilot_native.bridge",
+        "inject_interrupt",
+        "copilot_native_interrupt_failed",
+        "copilot-native interrupt",
+        (OSError, RuntimeError),
+        True,
+    ),
     "hermes": _UniformInterrupt(
         "omnigent.harnesses.hermes_native.bridge",
         "inject_interrupt",
@@ -258,6 +266,12 @@ _UNIFORM_STOP: dict[str, _UniformStop] = {
         "kimi_native_stop_failed",
         "kimi-native stop",
         "Kimi",
+    ),
+    "copilot": _UniformStop(
+        "omnigent.harnesses.copilot_native.bridge",
+        "copilot_native_stop_failed",
+        "copilot-native stop",
+        "Copilot",
     ),
     "hermes": _UniformStop(
         "omnigent.harnesses.hermes_native.bridge",

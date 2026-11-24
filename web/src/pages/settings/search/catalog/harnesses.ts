@@ -31,6 +31,7 @@ export const HARNESS_DESCRIPTIONS: Readonly<Record<NativeHarnessId, string>> = {
   "antigravity-native": "Google’s agent platform for software development.",
   "kiro-native": "An agentic IDE for spec-driven development.",
   "qwen-native": "An open-source terminal coding agent powered by Qwen.",
+  "copilot-native": "Continue the same GitHub Copilot CLI session from your terminal or Omnigent.",
   "goose-native": "An open-source local agent for coding and automation.",
   "kimi-native": "A terminal coding agent for editing code and running commands.",
   "hermes-native": "An agent that learns reusable skills from experience.",

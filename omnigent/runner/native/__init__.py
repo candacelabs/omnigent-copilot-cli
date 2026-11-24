@@ -1,5 +1,6 @@
 """Native terminal orchestration."""
 
+from omnigent.runner.native.copilot import _launch_copilot
 from omnigent.runner.native.orchestration import (
     _AGY_COLD_START_PORT_POLL_INTERVAL_S,
     _AGY_COLD_START_PORT_TIMEOUT_S,
@@ -220,6 +221,7 @@ __all__ = [
     "_launch_antigravity",
     "_launch_claude",
     "_launch_codex",
+    "_launch_copilot",
     "_launch_cursor",
     "_launch_devin",
     "_launch_goose",

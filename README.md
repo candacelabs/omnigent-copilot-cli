@@ -1,19 +1,57 @@
-<div align="center">
+# GitHub Copilot CLI for Omnigent
 
-# <img src="https://raw.githubusercontent.com/omnigent-ai/omnigent/main/docs/images/omnigent-logo.svg" alt="" height="38" valign="middle" /> Omnigent
+Start in GitHub Copilot’s own terminal, open the conversation link, and send the next message from Omnigent. Both interfaces drive one Copilot process in the same workspace. You can detach your terminal, keep working in Omnigent, and reattach by conversation ID.
 
-### The open-source meta-harness for all your AI agents.
+This Candace Labs distribution includes the native harness in the Omnigent package alongside Codex and Claude Code. The existing `omnigent copilot` command still opens Omnigent’s SDK-backed Copilot chat. Use `omnigent copilot-native` for Copilot’s terminal.
 
-Omnigent is an open-source **meta-harness** that gives you a common orchestration layer over Claude Code, Codex, Cursor, OpenCode, Goose, Antigravity, GitHub Copilot, Devin, Kiro, Qwen Code, Kimi Code, Grok Build, Jcode, Hermes, Pi, OpenAI Agents / Open Responses, and the agents you write yourself: swap or combine harnesses without rewriting, enforce policies and sandboxing, and collaborate in real time from any device — terminal, browser, phone, or the native desktop app.
+## Install the native build
 
-[![PyPI version](https://img.shields.io/pypi/v/omnigent.svg)](https://pypi.org/project/omnigent/)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/omnigent-ai/omnigent/blob/main/LICENSE)
-[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/omnigent)
-![Status: alpha](https://img.shields.io/badge/status-alpha-orange.svg)
+On the host that will run Copilot, install tmux, GitHub Copilot CLI, and uv. Use Linux, macOS, or WSL with a Linux installation of these tools. Sign in on that host with `copilot login`. The native bridge has been exercised with Copilot CLI 1.0.112 and 1.0.114. [GitHub Copilot CLI installation](https://github.com/github/copilot-cli#installation) · [uv installation](https://docs.astral.sh/uv/getting-started/installation/)
 
-[omnigent.ai](https://omnigent.ai) · **[⬇️ Download the macOS desktop app](https://omnigent.ai/quickstart/install#install-the-desktop-app)**
+Download the matching Python wheels from the release. The core wheel includes the web UI. The command below uses the GitHub CLI to download the same files available from the release page. [Release downloads](https://github.com/candacelabs/omnigent-copilot-cli/releases)
 
-</div>
+```bash
+wheels=$(mktemp -d)
+gh release download copilot-native-v1 --repo candacelabs/omnigent-copilot-cli \
+  --pattern '*.whl' --dir "$wheels"
+uv tool install --python 3.12 --find-links "$wheels" 'omnigent==0.24.0.dev0+copilot.1'
+```
+
+Install the same build on your Omnigent server and runner host when they run separately. A local server started by this installation uses the bundled build.
+
+## Start, continue, reattach
+
+```bash
+cd /path/to/your/project
+omnigent copilot-native --server local
+```
+
+1. Complete Copilot’s sign-in and workspace trust prompts in the terminal, then send your first message.
+2. Open the web URL printed at startup. The **Terminal** view shows the running Copilot interface. A message sent from Omnigent’s conversation goes to that same terminal and the reply appears in its history.
+3. Detach a local tmux client with **Ctrl+B**, then **D**. Reattach from a shell with `omnigent copilot-native --server local --resume <conversation-id>`. Pass `--resume` on its own to pick a session.
+
+For a server you can reach from your phone, pass its URL to `--server` and open that server’s conversation link. Keep the runner host online. Copilot owns the workspace, login, native transcript, and interactive approval prompts. Omnigent mirrors completed messages and tool activity, and its configured tool policies apply in either interface.
+
+![A Copilot terminal showing the initial message, an Omnigent follow-up and the recalled release codename](docs/images/copilot-native-handoff.png)
+
+The first prompt above was typed in the terminal. The follow-up came from Omnigent. Copilot’s hosted model answered from the earlier turn.
+
+## Develop and test
+
+The harness implementation is in [omnigent/harnesses/copilot_native](omnigent/harnesses/copilot_native). The runner launches the terminal, the inner executor delivers Omnigent messages to it, and the forwarder mirrors Copilot’s session events. Use the same editable checkout and contribution workflow as the other native integrations. [Contributing](CONTRIBUTING.md) · [Agent specification](docs/AGENT_YAML_SPEC.md)
+
+```bash
+OMNIGENT_SKIP_WEB_UI=true uv sync --frozen --extra all --group dev
+uv run --no-sync pre-commit install
+uv run --no-sync pytest tests/harnesses/copilot_native tests/inner/test_copilot_native_executor.py \
+  tests/runner/test_copilot_native_terminal.py tests/e2e/test_copilot_native_cli_e2e.py
+```
+
+The end-to-end test runs the real Copilot binary against a loopback model. It sends a terminal turn and a web turn, checks the model received both in context, and reattaches to the same process. The optional [dis devcontainer](.dis/Dockerfile) provides tmux and a pinned Copilot CLI for this test.
+
+## Omnigent
+
+The general Omnigent guide follows. Its standard PyPI and desktop installation instructions apply to the upstream distribution. Use the release wheels above to get this native integration.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/omnigent-ai/omnigent/main/docs/images/omnigent-desktop.png" alt="The Omnigent desktop app: starting a new session, with pinned and project-grouped sessions in the sidebar" width="720" />

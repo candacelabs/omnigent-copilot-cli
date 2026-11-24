@@ -69,6 +69,7 @@ from omnigent.runner.native import (
 from omnigent.runner.resource_registry import (
     CLAUDE_NATIVE_TERMINAL_ROLE,
     CODEX_NATIVE_TERMINAL_ROLE,
+    COPILOT_NATIVE_TERMINAL_ROLE,
     OMNIGENT_REPL_TERMINAL_ROLE,
     QWEN_NATIVE_TERMINAL_ROLE,
     SessionResourceRegistry,
@@ -149,6 +150,7 @@ def register_resource_routes(
     _ensure_comment_relay_started: _EnsureCommentRelayStartedFn,
     _ensure_session_registered: Callable[[str], Coroutine[Any, Any, None]],
     _goose_terminal_ensure_locks: dict[str, asyncio.Lock],
+    _copilot_terminal_ensure_locks: dict[str, asyncio.Lock],
     _hermes_terminal_ensure_locks: dict[str, asyncio.Lock],
     _kimi_terminal_ensure_locks: dict[str, asyncio.Lock],
     _kiro_terminal_ensure_locks: dict[str, asyncio.Lock],
@@ -410,6 +412,7 @@ def register_resource_routes(
                     "antigravity": _antigravity_terminal_ensure_locks,
                     "opencode": _opencode_terminal_ensure_locks,
                     "goose": _goose_terminal_ensure_locks,
+                    "copilot": _copilot_terminal_ensure_locks,
                     "hermes": _hermes_terminal_ensure_locks,
                     "qwen": _qwen_terminal_ensure_locks,
                     "kimi": _kimi_terminal_ensure_locks,
@@ -504,7 +507,7 @@ def register_resource_routes(
                     "and could not be closed."
                 )
 
-            elif terminal_name in ("pi", "opencode"):
+            elif terminal_name in ("pi", "opencode", "copilot"):
                 # pi/opencode resolve the spec unwrapped — a resolution error
                 # surfaces as a terminal-start error (the resolver does not
                 # swallow it).
@@ -516,6 +519,18 @@ def register_resource_routes(
                     )
 
                 _ensure_build = _spec_ensure_build
+                if terminal_name == "copilot":
+
+                    def _copilot_ensure_owned(
+                        registry: SessionResourceRegistry, resource: SessionResourceView
+                    ) -> bool:
+                        return (
+                            registry.terminal_resource_role(resource.session_id, resource.id)
+                            == COPILOT_NATIVE_TERMINAL_ROLE
+                            and resource.metadata.get("running") is not False
+                        )
+
+                    _ensure_is_owned = _copilot_ensure_owned
 
             elif terminal_name in (
                 "cursor",
@@ -742,16 +757,26 @@ def register_resource_routes(
             if terminal_name == "claude":
                 # A live pane still needs its advertisement for message delivery.
                 await _readvertise_live_claude_pane(conv_id, instance, terminal_registry)
-            if terminal_name != "codex":
-                return
-            terminal_id = terminal_resource_id("codex", "main")
-            if (
-                resource_registry.terminal_resource_role(conv_id, terminal_id)
-                != CODEX_NATIVE_TERMINAL_ROLE
-            ):
-                return
-            resource = await resource_registry.get_terminal_resource(conv_id, terminal_id)
-            if resource is None or _is_runner_owned_codex_terminal(resource_registry, resource):
+            if terminal_name == "copilot":
+                terminal_id = terminal_resource_id(terminal_name, "main")
+                if (
+                    resource_registry.terminal_resource_role(conv_id, terminal_id)
+                    == COPILOT_NATIVE_TERMINAL_ROLE
+                ):
+                    return
+            elif terminal_name == "codex":
+                terminal_id = terminal_resource_id("codex", "main")
+                if (
+                    resource_registry.terminal_resource_role(conv_id, terminal_id)
+                    != CODEX_NATIVE_TERMINAL_ROLE
+                ):
+                    return
+                resource = await resource_registry.get_terminal_resource(conv_id, terminal_id)
+                if resource is None or _is_runner_owned_codex_terminal(
+                    resource_registry, resource
+                ):
+                    return
+            else:
                 return
             # The terminal ensure rechecks ownership under its launch lock.
         elif instance is not None:

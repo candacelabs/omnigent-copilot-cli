@@ -65,6 +65,7 @@ export function codexNativeSubagentLabel(
 export type NativeCodingAgentIconKind =
   | "claude"
   | "codex"
+  | "copilot"
   | "opencode"
   | "pi"
   | "cursor"
@@ -86,6 +87,7 @@ export type NativeCodingAgentCapability =
 
 export interface NativeCodingAgentSpec {
   key: NativeCodingAgentIconKind;
+  cliCommand?: string;
   agentName: string;
   harness: string;
   wrapperLabel: string;
@@ -228,6 +230,16 @@ export const NATIVE_CODING_AGENTS = [
     capabilities: ["skipPermissions"],
   },
   {
+    key: "copilot",
+    cliCommand: "copilot-native",
+    agentName: "copilot-native-ui",
+    harness: "copilot-native",
+    wrapperLabel: "copilot-native-ui",
+    displayName: "GitHub Copilot CLI",
+    iconKind: "copilot",
+    sortRank: 35,
+  },
+  {
     key: "goose",
     agentName: "goose-native-ui",
     harness: "goose-native",
@@ -302,6 +314,7 @@ const HARNESS_ALIASES: Record<string, string> = {
   "native-antigravity": "antigravity-native",
   "agy-native": "antigravity-native",
   "native-agy": "antigravity-native",
+  "native-copilot": "copilot-native",
   "native-goose": "goose-native",
   "native-qwen": "qwen-native",
   "native-kimi": "kimi-native",

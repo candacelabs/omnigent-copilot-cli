@@ -86,6 +86,7 @@ ANTIGRAVITY_NATIVE_TERMINAL_ROLE = "antigravity-native"
 QWEN_NATIVE_TERMINAL_ROLE = "qwen-native"
 KIMI_NATIVE_TERMINAL_ROLE = "kimi-native"
 HERMES_NATIVE_TERMINAL_ROLE = "hermes-native"
+COPILOT_NATIVE_TERMINAL_ROLE = "copilot-native"
 DEVIN_NATIVE_TERMINAL_ROLE = "devin-native"
 
 #: Terminal roles whose PTY-activity watcher drives the session's working

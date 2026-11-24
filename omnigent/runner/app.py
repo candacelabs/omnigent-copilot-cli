@@ -1650,6 +1650,7 @@ def create_runner_app(
     _goose_terminal_ensure_locks: dict[str, asyncio.Lock] = {}
     _qwen_terminal_ensure_locks: dict[str, asyncio.Lock] = {}
     _kimi_terminal_ensure_locks: dict[str, asyncio.Lock] = {}
+    _copilot_terminal_ensure_locks: dict[str, asyncio.Lock] = {}
     _hermes_terminal_ensure_locks: dict[str, asyncio.Lock] = {}
     _claude_terminal_ensure_locks: dict[str, asyncio.Lock] = {}
     _antigravity_terminal_ensure_locks: dict[str, asyncio.Lock] = {}
@@ -1667,6 +1668,7 @@ def create_runner_app(
             "antigravity": _antigravity_terminal_ensure_locks,
             "opencode": _opencode_terminal_ensure_locks,
             "goose": _goose_terminal_ensure_locks,
+            "copilot": _copilot_terminal_ensure_locks,
             "hermes": _hermes_terminal_ensure_locks,
             "qwen": _qwen_terminal_ensure_locks,
             "kimi": _kimi_terminal_ensure_locks,
@@ -3692,8 +3694,8 @@ def create_runner_app(
 
                 _launch_pre = _antigravity_pre_launch
 
-            elif harness_name == "pi-native":
-                # pi resolves its spec unwrapped — a resolution error surfaces as
+            elif harness_name in ("pi-native", "copilot-native"):
+                # Resolve the actual spec — a resolution error surfaces as
                 # a terminal-start error (the resolver does not swallow it).
                 _launch_resolve_spec = lambda: _resolve_session_agent_spec(session_id)  # noqa: E731
             elif harness_name in (
@@ -4272,6 +4274,7 @@ def create_runner_app(
         _goose_terminal_ensure_locks.pop(session_id, None)
         _qwen_terminal_ensure_locks.pop(session_id, None)
         _kimi_terminal_ensure_locks.pop(session_id, None)
+        _copilot_terminal_ensure_locks.pop(session_id, None)
         _hermes_terminal_ensure_locks.pop(session_id, None)
         _repl_terminal_ensure_locks.pop(session_id, None)
         _interrupted_sessions.discard(session_id)
@@ -4473,6 +4476,7 @@ def create_runner_app(
             "qwen-native",
             "kimi-native",
             "hermes-native",
+            "copilot-native",
         }:
             return
         if status == "idle" and harness in {"codex-native", "antigravity-native"}:
@@ -9189,6 +9193,7 @@ def create_runner_app(
         _ensure_comment_relay_started=_ensure_comment_relay_started,
         _ensure_session_registered=_ensure_session_registered,
         _goose_terminal_ensure_locks=_goose_terminal_ensure_locks,
+        _copilot_terminal_ensure_locks=_copilot_terminal_ensure_locks,
         _hermes_terminal_ensure_locks=_hermes_terminal_ensure_locks,
         _kimi_terminal_ensure_locks=_kimi_terminal_ensure_locks,
         _kiro_terminal_ensure_locks=_kiro_terminal_ensure_locks,
@@ -9489,6 +9494,7 @@ def create_runner_app(
         _goose_terminal_ensure_locks.pop(session_id, None)
         _qwen_terminal_ensure_locks.pop(session_id, None)
         _kimi_terminal_ensure_locks.pop(session_id, None)
+        _copilot_terminal_ensure_locks.pop(session_id, None)
         _hermes_terminal_ensure_locks.pop(session_id, None)
         _repl_terminal_ensure_locks.pop(session_id, None)
         if process_manager is not None:
@@ -9520,6 +9526,7 @@ def create_runner_app(
         _goose_terminal_ensure_locks.pop(session_id, None)
         _qwen_terminal_ensure_locks.pop(session_id, None)
         _kimi_terminal_ensure_locks.pop(session_id, None)
+        _copilot_terminal_ensure_locks.pop(session_id, None)
         _hermes_terminal_ensure_locks.pop(session_id, None)
         _repl_terminal_ensure_locks.pop(session_id, None)
         await _teardown_session_terminals(session_id)

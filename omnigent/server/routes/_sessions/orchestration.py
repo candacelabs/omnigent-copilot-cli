@@ -3546,10 +3546,11 @@ async def _persist_external_conversation_item_unlocked(
         # recorded leaves a stale head entry, and draining by position would
         # hand it to THIS message (see ``omnigent.runtime.pending_inputs``).
         # Skipped older entries are persisted as undelivered. A miss falls back
-        # to the oldest entry, except for Kiro, whose prompt text is exact.
+        # to the oldest entry unless the native transcript records exact prompt text.
         text = _message_text(item.data.content) or ""
         agent_message_candidate = body.data.get("agent_message_candidate") is True
         native_agent = _native_coding_agent_for_session(conv)
+        exact_prompt_text = native_agent is not None and native_agent.key in {"copilot", "kiro"}
         matched = pending_inputs.resolve_matching_text(
             session_id,
             text,
@@ -3562,7 +3563,7 @@ async def _persist_external_conversation_item_unlocked(
             # Ambiguous markup can be direct terminal input. Only its exact
             # pending match is evidence of a web submission; preserve others.
             held_older = [*matched.skipped, *matched.uncertain]
-        elif item.stable_id is not None or _is_kiro_native_session(conv):
+        elif item.stable_id is not None or exact_prompt_text:
             skipped_pending = [
                 pending_inputs.classify_missing_native_record(entry) for entry in matched.skipped
             ]
@@ -3575,7 +3576,7 @@ async def _persist_external_conversation_item_unlocked(
             # message would brand everything queued in between undelivered.
             # Leave the older entries queued for a later mirror instead.
             held_older = [*matched.skipped, *matched.uncertain]
-        if drained is None and not agent_message_candidate and not _is_kiro_native_session(conv):
+        if drained is None and not agent_message_candidate and not exact_prompt_text:
             drained = pending_inputs.resolve_oldest(session_id, hold=True)
             if drained is not None:
                 match_method = "fifo_fallback"

@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import asyncio
 import json
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 
 import click
 import httpx
@@ -264,6 +264,7 @@ async def launch_or_reuse_daemon_runner(
     session_id: str,
     workspace: str,
     fresh: bool = False,
+    harness_env: Mapping[str, str] | None = None,
 ) -> str:
     """
     Ensure the session is bound to a daemon-spawned runner; return its id.
@@ -286,13 +287,14 @@ async def launch_or_reuse_daemon_runner(
         Safe to set when the session was just created in this same startup
         sequence — a brand-new session can't have a runner bound yet, so
         the read would always return empty and only add latency (~2-3s).
+    :param harness_env: Local vendor configuration to hand only to this runner launch.
     :returns: The bound runner id, e.g. ``"runner_abc123"``.
     :raises click.ClickException: If the launch request fails.
     """
     from omnigent.cli_auth import databricks_request_headers
     from omnigent.session_host import set_session_host
 
-    session_env = requested_session_env()
+    session_env = {**(harness_env or {}), **requested_session_env()}
     headers = launch_audit_headers(host_id=host_id, fresh=fresh)
     owner_host = host_id
     if fresh:

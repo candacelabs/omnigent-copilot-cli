@@ -67,6 +67,16 @@ def is_forwardable_name(name: str) -> bool:
     )
 
 
+def copilot_native_env(source: Mapping[str, str]) -> dict[str, str]:
+    """Select GitHub Copilot's configuration and authentication from the launching host."""
+    return {
+        name: value
+        for name, value in source.items()
+        if name.startswith("COPILOT_")
+        or name in {"GH_HOST", "GH_CONFIG_DIR", "GH_TOKEN", "GITHUB_TOKEN"}
+    }
+
+
 def requested_session_env(source: Mapping[str, str] | None = None) -> dict[str, str]:
     """Collect the variables the launching shell asked to forward.
 

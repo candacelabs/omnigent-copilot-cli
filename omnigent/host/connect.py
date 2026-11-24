@@ -161,7 +161,7 @@ from omnigent.host.git_worktree import (
 from omnigent.host.identity import HostIdentity, load_or_create_host_identity
 from omnigent.host.maintenance import HostMaintenanceJanitor
 from omnigent.host.runner_zygote import ZygoteManager, ZygoteRunnerProc, ZygoteUnavailable
-from omnigent.host.session_env import consume_session_env_handoff
+from omnigent.host.session_env import consume_session_env_handoff, copilot_native_env
 from omnigent.inner import _proc
 from omnigent.onboarding.harness_accounts import (
     HARNESS_ACCOUNT_KEYS,
@@ -620,6 +620,7 @@ _RUNNER_ENV_ALLOWLIST: frozenset[str] = frozenset(
         "TERM",
         "TERMINFO",
         "TERMINFO_DIRS",
+        "OMNIGENT_COPILOT_PATH",
         "LANG",
         "SSL_CERT_FILE",
         "SSL_CERT_DIR",
@@ -1059,6 +1060,9 @@ def _build_runner_env(
             inference_config, include_dollar_key_refs=True
         )
     forwarded = HARNESS_CREDENTIAL_ENV_VARS | extra_names | config_env_vars
+    if harness == "copilot-native":
+        forwarded |= set(copilot_native_env(base_env))
+
     env = {
         key: value
         for key, value in base_env.items()
@@ -1071,7 +1075,12 @@ def _build_runner_env(
         env["OMNIGENT_MCP_AUTH_STATUS_FILE"] = str(Path(auth_status_file).expanduser().absolute())
     if session_env:
         env.update(session_env)
-        env[RUNNER_SESSION_ENV_NAMES_ENV_VAR] = ",".join(sorted(session_env))
+        # Copilot's terminal selects its own settings. Keep its auth out of the
+        # session-wide allowlist inherited by generic child processes.
+        harness_names = copilot_native_env(session_env) if harness == "copilot-native" else {}
+        env[RUNNER_SESSION_ENV_NAMES_ENV_VAR] = ",".join(
+            sorted(session_env.keys() - harness_names.keys())
+        )
     env["RUNNER_SERVER_URL"] = server_url
     env[RUNNER_ID_ENV_VAR] = runner_id
     env[RUNNER_TUNNEL_BINDING_TOKEN_ENV_VAR] = binding_token

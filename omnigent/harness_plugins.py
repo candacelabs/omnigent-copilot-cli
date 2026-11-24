@@ -18,6 +18,7 @@ from omnigent._wrapper_labels import (
     ANTIGRAVITY_NATIVE_WRAPPER_VALUE,
     CLAUDE_NATIVE_WRAPPER_VALUE,
     CODEX_NATIVE_WRAPPER_VALUE,
+    COPILOT_NATIVE_WRAPPER_VALUE,
     CURSOR_NATIVE_WRAPPER_VALUE,
     DEVIN_NATIVE_WRAPPER_VALUE,
     GOOSE_NATIVE_WRAPPER_VALUE,
@@ -62,6 +63,7 @@ class NativeCodingAgent:
     wrapper_label: str
     terminal_name: str
     subagent_wrapper_label: str | None = None
+    cli_command: str | None = None
 
     @property
     def presentation_labels(self) -> dict[str, str]:
@@ -203,6 +205,16 @@ KIRO_NATIVE_CODING_AGENT = NativeCodingAgent(
     terminal_name="kiro",
 )
 
+COPILOT_NATIVE_CODING_AGENT = NativeCodingAgent(
+    key="copilot",
+    display_name="GitHub Copilot CLI",
+    agent_name="copilot-native-ui",
+    harness="copilot-native",
+    wrapper_label=COPILOT_NATIVE_WRAPPER_VALUE,
+    terminal_name="copilot",
+    cli_command="copilot-native",
+)
+
 GOOSE_NATIVE_CODING_AGENT = NativeCodingAgent(
     key="goose",
     display_name="Goose",
@@ -314,6 +326,7 @@ _BUILTIN_NATIVE_PROVIDERS: tuple[NativeHarnessProvider, ...] = tuple(
     for agent in (
         CLAUDE_NATIVE_CODING_AGENT,
         CODEX_NATIVE_CODING_AGENT,
+        COPILOT_NATIVE_CODING_AGENT,
         PI_NATIVE_CODING_AGENT,
         OPENCODE_NATIVE_CODING_AGENT,
         CURSOR_NATIVE_CODING_AGENT,
@@ -384,6 +397,22 @@ _BUILTIN_CAPABILITIES: dict[str, HarnessCapabilities] = {
         fork_history=_FH.REBUILD,
         shell_tool_name="shell",
         shell_tool_prompt=_SHELL_PROMPT,
+        instruction_delivery=_ID.AGENT_STARTUP_ADDITIVE,
+        workspace_file_mentions=True,
+    ),
+    "copilot-native": _C(
+        _IM.NATIVE_TUI,
+        _EL.HOOK,
+        _RS.WARM_REATTACH,
+        _EF.NONE,
+        _MF.MULTI,
+        _AU.OWN_AUTH,
+        subagents=False,
+        interrupt=True,
+        streaming=False,
+        fork_history=_FH.NONE,
+        shell_tool_name="bash",
+        shell_tool_prompt=_BASH_PROMPT,
         instruction_delivery=_ID.AGENT_STARTUP_ADDITIVE,
         workspace_file_mentions=True,
     ),
@@ -787,6 +816,7 @@ _BUILTIN_CONTRIBUTION = HarnessContribution(
             "codex",
             "codex-native",
             "copilot",
+            "copilot-native",
             "cursor",
             "cursor-native",
             "devin-native",
@@ -821,6 +851,7 @@ _BUILTIN_CONTRIBUTION = HarnessContribution(
         "codex": "omnigent.inner.codex_harness",
         "codex-native": "omnigent.inner.codex_native_harness",
         "copilot": "omnigent.inner.copilot_harness",
+        "copilot-native": "omnigent.inner.copilot_native_harness",
         "cursor": "omnigent.inner.cursor_harness",
         "cursor-native": "omnigent.inner.cursor_native_harness",
         "goose": "omnigent.inner.goose_harness",
@@ -857,6 +888,7 @@ _BUILTIN_CONTRIBUTION = HarnessContribution(
         "kimi-code": "kimi",
         "native-agy": "antigravity-native",
         "native-antigravity": "antigravity-native",
+        "native-copilot": "copilot-native",
         "native-devin": "devin-native",
         "native-goose": "goose-native",
         "native-hermes": "hermes-native",
@@ -875,6 +907,7 @@ _BUILTIN_CONTRIBUTION = HarnessContribution(
             "antigravity-native",
             "claude-native",
             "codex-native",
+            "copilot-native",
             "cursor-native",
             "devin-native",
             "goose-native",
@@ -885,6 +918,7 @@ _BUILTIN_CONTRIBUTION = HarnessContribution(
             "native-antigravity",
             "native-claude",
             "native-codex",
+            "native-copilot",
             "native-cursor",
             "native-devin",
             "native-goose",
@@ -902,6 +936,7 @@ _BUILTIN_CONTRIBUTION = HarnessContribution(
     native_agents=(
         CLAUDE_NATIVE_CODING_AGENT,
         CODEX_NATIVE_CODING_AGENT,
+        COPILOT_NATIVE_CODING_AGENT,
         PI_NATIVE_CODING_AGENT,
         OPENCODE_NATIVE_CODING_AGENT,
         CURSOR_NATIVE_CODING_AGENT,
